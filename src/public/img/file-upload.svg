@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="41.076721mm"
+   height="46.07185mm"
+   viewBox="0 0 41.076721 46.07185"
+   version="1.1"
+   id="svg5"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     showguides="true" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Camada 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-8.0960514,-18.193487)">
+    <path
+       id="rect184"
+       style="fill:#ffffff;stroke:#717171;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"
+       d="m 16.84131,19.404718 h 19.220963 l 0.05002,7.853562 c 0.01188,1.864622 1.501534,3.403451 3.365813,3.365812 l 8.494669,-0.171506 v 29.246938 c 0,1.86466 -1.501153,3.365812 -3.365813,3.365812 H 16.84131 c -1.86466,0 -3.365812,-1.501152 -3.365812,-3.365812 V 22.77053 c 0,-1.864659 1.501152,-3.365812 3.365812,-3.365812 z m 19.38124,-0.01123 11.539927,11.219374"
+       sodipodi:nodetypes="scsscssssss" />
+    <rect
+       style="fill:#ff0707;fill-opacity:1;stroke:#ff0707;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5734"
+       width="23.560684"
+       height="11.219375"
+       x="9.296052"
+       y="27.247051"
+       ry="1.4424909" />
+    <text
+       xml:space="preserve"
+       style="font-size:8.06487px;font-family:Roboto;-inkscape-font-specification:Roboto;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.696;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       x="13.996673"
+       y="35.723549"
+       id="text7034"><tspan
+         sodipodi:role="line"
+         id="tspan7032"
+         style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.696;stroke-dasharray:none;stroke-opacity:1"
+         x="13.996673"
+         y="35.723549">PDF</tspan></text>
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#717171;stroke-width:1.296;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 17.179666,50.289568 4.440829,-3.644173 4.096945,3.644174"
+       id="path7825"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#717171;stroke-width:1.296;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="M 21.620495,46.749514 V 57.473791"
+       id="path8016" />
+  </g>
+</svg>

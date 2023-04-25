@@ -1,1 +1,35 @@
-{{{Home}}}
+{{{Form}}}
+<script>
+let input = document.querySelector("input");
+input.addEventListener('change', handleFiles);
+
+function handleFiles() {
+    const fileList = Array( this.files )[0];
+    console.log(typeof( fileList))
+    console.log(fileList)
+    $("div.list").html('');
+    for(file of fileList){
+      const id = Array( fileList ).indexOf(file)
+        $("div.list").append(`
+            <div class="file">
+                <div class="icon"><img src="/img/file-upload.svg"/></div>
+                <span>${file.name}</span>
+                <button onclick="deletFile(${id})"><i class="fa-solid fa-xmark"></i></button>
+            </div>        
+        `)
+    }
+  // aqui você pode fazer o que quiser com os arquivos que foram selecionados pelo usuário
+}
+function deletFile(id){
+  const fileList = this.files;
+  const fileDelet = this.files[id];
+  let NewFileList = new FileList();
+  for(file of fileList)
+  {
+    if(file!=fileDelet){
+      NewFileList.append(file);
+    }
+  }
+  input.files = NewFileList;
+}
+</script>

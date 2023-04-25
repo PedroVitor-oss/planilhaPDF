@@ -1,0 +1,136 @@
+    <h1>Planilha</h1>
+
+<table id="table1">
+    <tr>
+        <th>periodo</th>
+        <th>DMR's</th>    
+        <th>Cod. IBGE</th>
+        <th>Residuo</th>
+        <th>classe</th>
+        <th>Volume</th>
+        <th>Tratamento</th>
+        <th>Transporte</th>
+        <th>Destino</th>
+    </tr>
+    {{#each dataPlanilha.lines}}
+    <tr>
+        <td>{{Periodo}}</td>
+        <td>{{DMR}}</td>
+        <td>{{codeIBGE}}</td>
+        <td>{{resido}}</td>
+        <td contenteditable="true" class="editable"></td>
+        <td>{{volume}}</td>
+        <td>{{tratamento}}</td>
+        <td contenteditable="true" class="editable"></td>
+        <td>{{destino}}</td>
+    </tr>
+    {{/each}}
+</table>
+<button id="btn-copiar-table1">Copiar</button>
+<h1>Soma</h1>
+<table id="table2">
+    <tr>
+        <th>residuo</th>
+        <th>tratamento</th>
+        <th>value</th>
+        
+    </tr>
+    {{#each dataPlanilha.tableSoma}}
+    <tr>
+        <td>{{residuo}}</td>
+        <td>{{tratamento}}</td>
+        <td>{{soma}}</td>
+    </tr>
+    {{/each}}
+</table>
+<button id="btn-copiar-table2">Copiar</button>
+<script>
+    const btnCopiar = document.querySelector('#btn-copiar-table1');
+    const tabela = document.querySelector('#table1');
+    const btnCopiar2 = document.querySelector('#btn-copiar-table2');
+    const tabela2 = document.querySelector('#table2');
+
+    btnCopiar.addEventListener('click', () => {
+    // Seleciona a tabela
+    const range = document.createRange();
+    range.selectNode(tabela);
+    window.getSelection().addRange(range);
+    
+    try {
+        // Copia a tabela para a área de transferência
+        document.execCommand('copy');
+        alert('Tabela copiada para a área de transferência!');
+    } catch (err) {
+        alert('Não foi possível copiar a tabela: ' + err);
+    }
+
+    // Limpa a seleção da tabela
+    window.getSelection().removeAllRanges();
+    });
+
+    btnCopiar2.addEventListener('click', () => {
+    // Seleciona a tabela
+    const range = document.createRange();
+    range.selectNode(tabela2);
+    window.getSelection().addRange(range);
+    
+    try {
+        // Copia a tabela para a área de transferência
+        document.execCommand('copy');
+        alert('Tabela copiada para a área de transferência!');
+    } catch (err) {
+        alert('Não foi possível copiar a tabela: ' + err);
+    }
+
+    // Limpa a seleção da tabela
+    window.getSelection().removeAllRanges();
+    });
+</script>
+<script>
+ const lines = {{jsonLine}}
+</script>
+<style>
+    body{
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+
+    }
+    .editable
+    {
+        text-align: center;
+        outline: none;
+    }
+    button
+        {
+            background:#05f;
+            color:#fff;
+            border:none;
+            border-radius:20px;
+            padding:10px 20px;
+            font-size:1.2pc;
+
+        }
+    h1
+    {
+        text-align: center;
+    }
+      table{
+        border-collapse: collapse;;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        width: 100%;
+      }
+      th,th
+      {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: center;
+        vertical-align: middle;
+      }
+      th{
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+      tr
+</style>
