@@ -116,76 +116,80 @@
     });
 </script>
 <script>
- const lines = [{{#each dataPlanilha.lines}}{ residuo: `{{resido}}`,codeIBGE: `{{codeIBGE}}`,volume:`{{volume}}`,tratamento:`{{tratamento}}`,destino:`{{destino}}` }, {{/each}}];
- let tableSoma = [];
- let tableSomaTratamento = [];
- for(line of lines){
-    let newItemSoma = true;
-    for(soma of tableSoma){
-        if(line.codeIBGE == soma.codeIBGE){
-            newItemSoma= false;
-            let somaVolumeSoma = parseFloat(String(soma.volume).replace(',','.'));
-            let SomaVolumeLine = parseFloat(String(line.volume).replace(',','.'));
-            soma.volume =somaVolumeSoma+SomaVolumeLine;
-            soma.volume = Number(soma.volume).toFixed(4);
-            soma.volume = String(soma.volume).replace('.',',');
-            //console.log(soma.volume)
+    const lines = [{{#each dataPlanilha.lines}}{ residuo: `{{resido}}`,codeIBGE: `{{codeIBGE}}`,volume:`{{volume}}`,tratamento:`{{tratamento}}`,destino:`{{destino}}` }, {{/each}}];
+    let tableSoma = [];
+    let tableSomaTratamento = [];
+    
+    for(line of lines){
+        let newItemSoma = true;
+        for(soma of tableSoma){
+            if(line.codeIBGE == soma.codeIBGE){
+                newItemSoma= false;
+                let somaVolumeSoma = parseFloat(String(soma.volume).replace(',','.'));
+                let SomaVolumeLine = parseFloat(String(line.volume).replace(',','.'));
+                soma.volume =somaVolumeSoma+SomaVolumeLine;
+                soma.volume = Number(soma.volume).toFixed(4);
+                soma.volume = String(soma.volume).replace('.',',');
+                //console.log(SomaVolumeLine+" - "+soma.codeIBGE+" - soma new value:"+ soma.volume);
+                break;
+            }
+        }
+        if(newItemSoma){
+            tableSoma.push(line);
+            //console.log(line.volume+" - "+line.codeIBGE+" - novo")
         }
     }
-    if(newItemSoma){
-        tableSoma.push(line);
-    }
- }
+    const SomaTableCont = tableSoma;
 
-for(line of lines){
-    let newItemSoma = true;
-    for(soma of tableSomaTratamento){
-        if(line.tratamento == soma.tratamento){
-            newItemSoma= false;
-            let somaVolumeSoma = parseFloat(String(soma.volume).replace(',','.'));
-            let SomaVolumeLine = parseFloat(String(line.volume).replace(',','.'));
-            soma.volume =somaVolumeSoma+SomaVolumeLine;
-            soma.volume = Number(soma.volume).toFixed(4);
-            soma.volume = String(soma.volume).replace('.',',');
-            //console.log(soma.volume)
-        }
-    }
-    if(newItemSoma){
-        tableSomaTratamento.push(line);
-    }
- }
+    SomaTableCont.forEach(soma=>{
 
-
-
-tableSoma.forEach(soma=>{
-    soma.soma = Number(soma.soma).toFixed(2);
-    $("table#table2").append(`
-    <tr>
-        <td>...</td>
-        <td>${soma.residuo}</td>
-        <td>${soma.codeIBGE}</td>
-        <td>...</td>
-        <td>${soma.volume}</td>
-        <td>...</td>
-        <td>...</td>
-        <td>${soma.tratamento}</td>
-        <td>...</td>
-        <td>${soma.destino}</td>
-    </tr>
-    `)
-})
-    
-tableSomaTratamento.forEach(soma=>{
-    $("#table3").append(`
-    
-    <tr>
-        <td>${soma.tratamento}</td>
-        <td>${soma.volume}</td>
-    </tr>
-
-        
+        $("table#table2").append(`
+        <tr>
+            <td>...</td>
+            <td>${soma.residuo}</td>
+            <td>${soma.codeIBGE}</td>
+            <td>...</td>
+            <td>${soma.volume}</td>
+            <td>...</td>
+            <td>...</td>
+            <td>${soma.tratamento}</td>
+            <td>...</td>
+            <td>${soma.destino}</td>
+        </tr>
         `)
-})
+    })
+        
+    SomaTableCont.forEach(line=>{
+        let newItemSoma = true;
+        for(tratamento of tableSomaTratamento){
+            if(tratamento.tratamento == line.tratamento){
+                
+                 let somaVolumeTratamento = parseFloat(String(tratamento.volume).replace(',','.'));
+                let SomaVolumeLine = parseFloat(String(line.volume).replace(',','.'));
+                tratamento.volume = somaVolumeTratamento+SomaVolumeLine;
+                tratamento.volume = Number(tratamento.volume).toFixed(4);
+                tratamento.volume = String(tratamento.volume).replace('.',',');
+                console.log(`valor antigo ${somaVolumeTratamento} somado com ${SomaVolumeLine} novo valor ${tratamento.volume} - soma`)
+
+
+                newItemSoma = false;
+                break;
+            }
+        }
+        if(newItemSoma){
+            tableSomaTratamento.push(line);
+            console.log(`valor ${line.volume} - novo`)
+        }
+    })
+
+    tableSomaTratamento.forEach(data=>{
+        $("#table3").append(`
+            <tr>
+                <td>${data.tratamento}</td>
+                <td>${data.volume}</td>
+            </tr>
+        `)
+    })
 </script>
 <style>
     body{
