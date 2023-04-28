@@ -2,6 +2,7 @@ const { app } = require("./src/app");
 const {createFormPDF,createStyleForm} = require("./components/FormPDF")
 const  port  = process.env.PORT ||require("./config.json").port;
 const fs = require('fs');
+const pdf = require("pdf-parse");
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' }); 
 
@@ -25,21 +26,22 @@ app.get("/",(req,res)=>{
     })
 })
 
-app.post("/planilha",upload.array('pdfFile'),(req,res)=>{
-    const pdf = require("pdf-parse");
-    
+app.post("/planilha",upload.array('pdfFile'),async (req,res)=>{
+   
     const files = req.files;
     let lines = [];
-    //console.log(files)
-    for(file of files){
+    let tableSoma = [];
+    //manipulando todos os arquivos
+
+    await files.forEach( file =>{
+        
         const tempFilePath = file.path;
         const bufferFile = fs.readFileSync(tempFilePath);
     
         pdf(bufferFile).then(data=>{
             
             const pages = data.text.split('\n\n');
-            //console.log(pages)
-            
+            //ler todas as paginas do documento
             for(pageText of pages){
                 const text = pageText;
                 if(text.length>20){
@@ -158,32 +160,21 @@ app.post("/planilha",upload.array('pdfFile'),(req,res)=>{
                     }
                 }
             }
-            if(files.indexOf(file)==files.length-1){
-                let tableSoma = [];
-                for(line of lines){
-                    if(tableSoma.length==0){
-                        tableSoma.push({code:line.codeIBGE,residuo:line.resido,tratamento:line.tratamento,soma:parseFloat(line.volume.replace(',','.'))});
-                    }else{
-                        for(let i=0;i<tableSoma.length;i++){
-                            let itemSoma = tableSoma[i];
-                            if(itemSoma.code == line.codeIBGE){
-                                itemSoma.soma+=parseFloat(line.volume.replace(',','.'))
-                            }else if(i==tableSoma.length-1){
-                                tableSoma.push({code:line.codeIBGE,residuo:line.resido,tratamento:line.tratamento,soma:parseFloat(line.volume.replace(',','.'))});
-                            }
-                        }
-                    }
-                }
-                res.render("planilha",{
-                    title:"planilha",
-                    dataPlanilha:{
-                        lines,
-                        tableSoma,
-                    }
-                })
-            }
         })
-    }
+    })
+   
+    
+    
+  
+
+    await res.render("planilha",{
+        title:"planilha",
+        dataPlanilha:{
+            lines,
+        }
+    })
+    
+   
 
 
 
