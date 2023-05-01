@@ -2,6 +2,7 @@ const { app } = require("./src/app");
 const {createFormPDF,createStyleForm} = require("./components/FormPDF")
 const  port  = process.env.PORT ||require("./config.json").port;
 const fs = require('fs');
+const requestIp = require('request-ip');
 const pdf = require("pdf-parse");
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' }); 
@@ -9,21 +10,29 @@ const upload = multer({ dest: 'uploads/' });
 
 app.get("/",(req,res)=>{
     const isMobile = req.headers['user-agent'].includes("Mobile");
-    res.render("home",
-    {
-        title:"PDF para planilha",
-        isMobile,
-        Form:createFormPDF(),
-        htmlStyles:[
-            {css:createStyleForm(isMobile)},
-        ],
-        styles:[
-            {css:"/css/home.css"}
-        ],
-        scripts:[
-            {js:"/js/ControleInputFile.js"}
-        ]
-    })
+    const ip = requestIp.getClientIp(req); 
+    if (true) { // Ignora o endereço IPv6 do servidor
+        console.log(`Endereço IP do cliente: ${ip}`);
+    }
+    if(isMobile){
+        res.redirect("/Cellfone");
+    }else{
+        res.render("home",
+        {
+            title:"PDF para planilha",
+            isMobile,
+            Form:createFormPDF(),
+            htmlStyles:[
+                {css:createStyleForm(isMobile)},
+            ],
+            styles:[
+                {css:"/css/home.css"}
+            ],
+            scripts:[
+                {js:"/js/ControleInputFile.js"}
+            ]
+        })
+    }
 })
 
 app.post("/planilha",upload.array('pdfFile'),async (req,res)=>{
@@ -168,7 +177,7 @@ app.post("/planilha",upload.array('pdfFile'),async (req,res)=>{
   
 
     await res.render("planilha",{
-        title:"planilha",
+        title:"Planilha DMR'S",
         dataPlanilha:{
             lines,
         }
@@ -180,6 +189,13 @@ app.post("/planilha",upload.array('pdfFile'),async (req,res)=>{
 
     
    
+})
+
+// app.get("/bloque",(req,res)=>{
+//     res.render("bloque");
+// })
+app.get("/Cellfone",(req,res)=>{
+    res.render("cellfone");
 })
 app.listen(port,console.log("aberto  em https://localhost:"+port));
 function GetDataString(datas,getData,lengthData){
