@@ -36,160 +36,65 @@ app.get("/",(req,res)=>{
 })
 
 app.post("/planilha",upload.array('pdfFile'),async (req,res)=>{
-   
-    const files = req.files;
-    let lines = [];
-    let tableSoma = [];
-    //manipulando todos os arquivos
-
-    await files.forEach( file =>{
-        
-        const tempFilePath = file.path;
-        const bufferFile = fs.readFileSync(tempFilePath);
+    const arquivos = req.files;
     
-        pdf(bufferFile).then(data=>{
+    Promise.all(arquivos.map(arquivo => pdf(arquivo.path))).then(datas=>{
+        let lines = [];
+        datas.forEach(data=>{
             
             const pages = data.text.split('\n\n');
             //ler todas as paginas do documento
+            
             for(pageText of pages){
                 const text = pageText;
                 if(text.length>20){
                     const DMR = GetDataString(text,'DMR nº',7);
-                    if(DMR==undefined){
-                        break;
-                    }
-                    const Periodo = GetDataString(text,"Periodo:",24);
-                    const textTabela = GetDataString(text,"Destinador",text.length)
-                    
-                    const arrayNumber = [0,1,2,3,4,5,6,7,8,9];
-                    const arrayChar = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-                    let datasTableString = []
-                    let newdata = '';
-                    //separador de texto bruto
-                    for(let i =0;i<textTabela.length;i++){
-                        if(textTabela[i]=='T'&&textTabela[i+7]=='a'){//inicio de 'Tabela'
-                            let contador = 8;
-                            for(l=contador;l<52;l++){
-                                const charSelect = textTabela[i+l];
-                                for(char of arrayChar){
-                                    if(char == charSelect){
-                                        //console.log(charSelect)
-                                        //console.log("char que representa uma letra do alfabeto");
-                                        contador = l;
-                                        //console.log("contador -",contador)
-                                        l=100;
-                                    }
-                                }
-                            }
+                    if(DMR!=undefined){
+                        const Periodo = GetDataString(text,"Periodo:",24);
+                        const textTabela = GetDataString(text,"Destinador",text.length)
+                        
+                       //dados brutos
+                        let datasTableString = SepararBruto(textTabela);
+                        
+                       //dados separados
+                       let dataTableDataSeparada = SepararDiluido(datasTableString);
+                      
+                       let linesOfPage = dataTableDataSeparada.map(
+                        function(data) {
                             
-                            newdata+=textTabela.slice(i,i+contador);
-                            //console.log(newdata);
-                            datasTableString.push(newdata);
-                            newdata = '';
-                            i+=contador-1;
-                        }else{
-                            newdata+=textTabela[i];
-                        }
-                    }
-                    //separando texto ja diluido
-                    for(datastring of datasTableString){
-                        let dadosSeparados = [];
-                        let newdado = '';
-                        for(let i =0;i<datastring.length;i++){
-                            const char = datastring.charAt(i);
-                            switch(dadosSeparados.length){
-                                case 0://tratamento
-                                    if(!isNaN(char) && char.trim().length){
-                                        
-                                        dadosSeparados.push( newdado );
-                                        newdado = '';
-                                        i--;
-                                    }else{
-                                        newdado+=char;
-                                    }
-                                break;
-                                case 1://cod. IBGE
-                                    if(char=='-'){
-                                        dadosSeparados.push( newdado );
-                                        newdado = '';
-                                    }else{
-                                        if(char!="("&&char!=")"&&char!='*'){
-                                            newdado+=char;
-                                        }
-                                    }
-                                break;
-                                case 2://residuo
-                                    if(!isNaN(char) && char.trim().length && datastring[i+15]=='-'){  
-                                        dadosSeparados.push( newdado );
-                                        newdado = '';
-                                        i+=16;//carateres cnpj
-                                    }else{
-                                        newdado+=char;
-                                    }
-                                break;
-                                case 3://destino
-                                    if(datastring[i]=='T'&&datastring[i+7]=='a'){
-                                        dadosSeparados.push( newdado );
-                                        newdado = '';
-                                        i+=6;
-                                    }else{
-                                        newdado+=char;
-                                    }
-                                break;
-                                default://unidade 
-                                    if(dadosSeparados.length==4){
-                                        dadosSeparados.push("Tonelada")
-                                    }else{
-                                        let newValue = '';
-                                        for(let l = 0;l<datastring.length-i;l++){
-                                            if(datastring[i+l] == ','){
-                                            
-                                            // console.log("virgula value =",newValue+datastring.slice(i+l,i+l+5));
-                                                dadosSeparados.push(newValue+datastring.slice(i+l,i+l+5));
-                                                i = i+l+4;
-                                                break;
-                                            }else{
-                                                newValue+=datastring[i+l];
-                                            }
-                                        }
-                                    }
-                                break;
+                            return {
+                                 DMR,
+                                Periodo,
+                                codeIBGE:data[1],
+                                resido:data[2],
+                                volume:data[5][0]==','?'0'+data[5]:data[5],
+                                tratamento:data[0],
+                                destino:data[3]
                             }
-                        }
-
-                        lines.push({
-                            DMR,
-                            Periodo,
-                            codeIBGE:dadosSeparados[1],
-                            resido:dadosSeparados[2],
-                            volume:dadosSeparados[5],
-                            tratamento:dadosSeparados[0],
-                            destino:dadosSeparados[3]
+                        });
+                       
+                        linesOfPage.forEach(line =>{
+                            lines.push(line);
                         })
+                       
                     }
                 }
             }
+
+            
         })
+     //console.log(lines);
+        res.render("planilha",{
+            title:"Planilha DMR'S",
+            dataPlanilha:{
+                lines,
+            }
+        });
     })
-   
-    
-    
-  
-
-    await res.render("planilha",{
-        title:"Planilha DMR'S",
-        dataPlanilha:{
-            lines,
-        }
-    })
-    
-   
 
 
-
-    
-   
 })
+
 
 // app.get("/bloque",(req,res)=>{
 //     res.render("bloque");
@@ -204,10 +109,131 @@ function GetDataString(datas,getData,lengthData){
             
             i = i+getData.length;
             let retutnSrting = '';
-            for(let l =i;l<i+lengthData;l++){             
+            for(let l =i;l<i+lengthData;l++){   
+                if(datas[l]!=undefined)          
                     retutnSrting += datas[l];
             }
             return retutnSrting.trim();
         }
     }
+}
+function SepararDiluido(data){
+    let tableReturn = [];
+
+    for(datastring of data){
+        let tableData = [];
+
+        //console.log("data - ",datastring);
+
+
+        let newdado = '';
+        for(let i =0;i<datastring.length;i++){
+        const char = datastring.charAt(i);
+        if(tableData.length<8){
+            switch(tableData.length){
+                case 0://tratamento
+                    if(!isNaN(char) && char.trim().length){
+                        
+                        tableData.push( newdado );
+                        newdado = '';
+                        i--;
+                    }else{
+                        newdado+=char;
+                    }
+                break;
+                case 1://cod. IBGE
+                    if(char=='-'){
+                        tableData.push( newdado );
+                        newdado = '';
+                    }else{
+                        if(char!="("&&char!=")"&&char!='*'){
+                            newdado+=char;
+                        }
+                    }
+                break;
+                case 2://residuo
+                    if(!isNaN(char) && char.trim().length && datastring[i+15]=='-'){  
+                        tableData.push( newdado );
+                        newdado = '';
+                        i+=16;//carateres cnpj
+                    }else{
+                        newdado+=char;
+                    }
+                break;
+                case 3://destino
+                    if(isUnidMedida(datastring,i).isUnid){
+                        tableData.push( newdado );
+                        newdado = '';
+                        i+=6;
+                    }else{
+                        newdado+=char;
+                    }
+                break;
+                default://unidade 
+                    if(tableData.length==4){
+                        tableData.push("Tonelada")
+                    }else{
+                        let newValue = '';
+                        for(let l = 0;l<datastring.length-i;l++){
+                            if(datastring[i+l] == ','){
+                            
+                            //// console.log("virgula value =",newValue+datastring.slice(i+l,i+l+5));
+                                tableData.push(newValue+datastring.slice(i+l,i+l+5));
+                                i = i+l+4;
+                                break;
+                            }else{
+                                newValue+=datastring[i+l];
+                            }
+                        }
+                    }
+                break;
+            }
+        }else{
+            tableReturn.push(tableData)
+            //console.log(tableData)
+            break;
+        }
+    }
+        
+    }
+    return tableReturn;
+}
+function isUnidMedida(text,index){
+    //Tonelada ou Unidade
+    return {
+        isUnid: (text[index]=='T'&&text[index+7]=='a')||(text[index]=='U'&&text[index+6]=='e'),
+        lengthUnid: (text[index]=='T'&&text[index+7]=='a')?8:7,
+        }
+}
+ function SepararBruto(data){
+    let newdata = '';
+    let tableReturn = [];
+    const arrayNumber = [0,1,2,3,4,5,6,7,8,9];
+    const arrayChar = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+    for(let i =0;i<data.length;i++){
+        if( isUnidMedida(data,i).isUnid){//inicio de 'Tabela'
+            let contador = 8;
+            for(l=contador;l<52;l++){
+                const charSelect = data[i+l];
+                for(char of arrayChar){
+                    if(char == charSelect){
+                        //console.log(charSelect)
+                        //console.log("char que representa uma letra do alfabeto");
+                        contador = l;
+                        //console.log("contador -",contador)
+                        l=100;
+                    }
+                }
+            }
+            
+            newdata+=data.slice(i,i+contador);
+            //console.log(newdata);
+            tableReturn.push(newdata);
+            newdata = '';
+            i+=contador-1;
+        }else{
+            newdata+=data[i];
+        }
+    }
+     return tableReturn;
 }
